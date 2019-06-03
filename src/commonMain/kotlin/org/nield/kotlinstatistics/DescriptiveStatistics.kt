@@ -76,26 +76,20 @@ class DescriptiveStatistics(val values: DoubleArray) {
     val sumSquared: Double by lazy { values.sumByDouble { it * it } }
 
     fun percentile(percentile: Double): Double {
-        // assumes values[] is already sorted
+        val sorted_values = values.sorted()
         if (percentile > 100 || percentile <= 0) error("$percentile is out of (0,100) range")
         return when (size) {
             0 -> Double.NaN
-            1 -> values[0] // always return single value for n = 1
+            1 -> sorted_values[0] // always return single value for n = 1
             else -> {
                 val k_plus_d = (percentile/100) * (size+1)
-                val k: Int = k_plus_d.toInt()   // Is Int enough?
+                val k: Int = k_plus_d.toInt()
                 val d = k_plus_d - k  //  d in 0..1
-                println("${k}, ${d}")  // TODO("remove")
                 when (k) {
-                    0 -> values[0]
-                    size -> values[size-1]
-                    else -> values[k-1] + d*(values[k]-values[k-1])
+                    0 -> sorted_values[0]
+                    size -> sorted_values[size-1]
+                    else -> sorted_values[k-1] + d*(sorted_values[k]-sorted_values[k-1])
                 }
-//                val work = getWorkArray(values, begin, length)
-//                val pivotsHeap = getPivots(values)
-//                if (work.size == 0) Double.NaN
-//                else
-//                    estimationType.evaluate(work, pivotsHeap, percentile, kthSelector)
             }
         }
     }
